@@ -2,9 +2,9 @@ import java.util.List;
 
 class EndingScreen extends Screen{
     // 랭크 입력하면 문자열 반환해주는 함수
-    static String rankOfCards(int rank) {
+    static String rankOfCards(long rank) {
         String rankString;
-        switch (rank / 1_00_00_00_00) {
+        switch ((int)(rank / 1_00_00_00_00)) {
             case 10:
                 rankString = "Straight Flush";
                 break;
@@ -41,7 +41,7 @@ class EndingScreen extends Screen{
         String[] playersRank = new String[n];
         
         for (int i = 0; i < playersRank.length; ++i) {
-            int rank = Rank.bestRank(players[i].hands);
+        long rank = Rank.bestRank(players[i].hands);
             playersRank[i] = rankOfCards(rank);
         }
         return playersRank;

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Rank {
     
-    public static int cardRank(LinkedList<Card> cards) {
+    public static long cardRank(LinkedList<Card> cards) {
         /*
          * 다섯 장을 판별하는 방법:
          * 1번째 카드: 2~5번째 카드와 비교
@@ -76,7 +76,7 @@ public class Rank {
          * 9~10: 하이 카드(2)
          */ 
         
-        int rank = 2_00_00_00_00;
+        long rank = 2_00_00_00_00;
         if (straight && flush) {
             rank = 10_00_00_00_00;
         } else if (pairCount == 6) { // 포카드
@@ -104,7 +104,7 @@ public class Rank {
     }
 
     // 각 족보의 하이 카드 return: 같은 rank일 때 족보를 따져보는 용도
-    public static int highCard(LinkedList<Integer> sortedNum, int rank) {
+    public static long highCard(LinkedList<Integer> sortedNum, long rank) {
         // 계산의 편리를 위해 sortedNum의 1(A) -> 14로 변환
         for (int i = 0; i < sortedNum.size(); ++i) {
             if (sortedNum.get(i) == 1) {
@@ -113,7 +113,7 @@ public class Rank {
         }
         Collections.sort(sortedNum);
 
-        int tempRank = rank / 1_00_00_00_00; // 족보만 추출
+        int tempRank = (int)(rank / 1_00_00_00_00); // 족보만 추출
         switch (tempRank) {
             // 5장 내에서 판단해야 하는 경우 중 스트레이트 플러시, 플러시, 스트레이트, 하이 카드
             case 10:
@@ -203,8 +203,8 @@ public class Rank {
             return rank;
         }
     
-    public static int bestRank(LinkedList<Card> cards) {
-        int bestRank = 2_00_00_00_00; // 가장 낮은 랭크로 초기화
+    public static long bestRank(LinkedList<Card> cards) {
+        long bestRank = 2_00_00_00_00; // 가장 낮은 랭크로 초기화
         /*
          * 7장의 카드 중 5장을 선택하는 모든 조합을 확인
          * i = 0, j = 1 ~ 6까지 검사
@@ -221,7 +221,7 @@ public class Rank {
                 temp.remove(j);
                 temp.remove(i);
 
-                int rank = cardRank(temp); // 선별된 5장의 카드 랭크 계산
+                long rank = cardRank(temp); // 선별된 5장의 카드 랭크 계산
                 if (rank > bestRank) {
                     bestRank = rank; // 더 좋은 랭크가 나오면 bestRank에 업데이트
                 }
@@ -231,12 +231,12 @@ public class Rank {
     }
     
     public static List<Integer> determineWinner(Player[] players) {
-        int maxRank = 0; // 최대 랭크값 초기화
+        long maxRank = 0; // 최대 랭크값 초기화
         List<Integer> winnersIndex = new ArrayList<>(); // 우승자의 인덱스를 저장할 리스트
     
         // 각 플레이어의 최종 순위를 계산하여 최대 랭크를 찾음
         for (int i = 0; i < players.length; i++) {
-            int rank = bestRank(players[i].hands); // 최종 랭크 계산
+            long rank = bestRank(players[i].hands); // 최종 랭크 계산
             if (rank > maxRank) {
                 maxRank = rank; // 더 높은 순위 발견 시 최대 랭크 업데이트
                 winnersIndex.clear(); // 이전 우승자 인덱스 초기화
