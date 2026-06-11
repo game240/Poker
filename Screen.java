@@ -1,5 +1,3 @@
-package MainRepository;
-
 public class Screen{
     protected static int selectedIndex = 0;
     public static void printScreen(){};

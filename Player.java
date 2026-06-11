@@ -1,5 +1,3 @@
-package MainRepository;
-
 import java.util.LinkedList;
 
 public class Player {

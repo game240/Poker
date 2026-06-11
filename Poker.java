@@ -1,5 +1,3 @@
-package MainRepository;
-
 import java.util.Scanner;
 
 public class Poker {

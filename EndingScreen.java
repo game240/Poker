@@ -1,5 +1,3 @@
-package MainRepository;
-
 import java.util.List;
 
 class EndingScreen extends Screen{
