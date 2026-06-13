@@ -4,7 +4,42 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Rank {
-    
+    /** 
+     * rank: 숫자가 클수록 높은 순위
+     * 총 12자리:
+     * 1~2: 족보
+     * 3~4: 페어(1) / 카드(1)
+     * 5~6: 페어(2) / 카드(2)
+     * 7~8: 하이 카드(1) / 카드(3)
+     * 9~10: 하이 카드(2) / 카드(4)
+     * 11~12: 하이 카드(3) / 카드(5)
+     * CATEGORY_BASE: 11자리
+     */ 
+    public static final long CATEGORY_BASE = 1_00_00_00_00_00L;
+
+    public static String rankToString(long rank) {
+        switch ((int) (rank / 1_00_00_00_00)) {
+            case 10:
+                return "Straight Flush";
+            case 9:
+                return "Four of a Kind";
+            case 8:
+                return "Full House";
+            case 7:
+                return "Flush";
+            case 6:
+                return "Straight";
+            case 5:
+                return "Three of a Kind";
+            case 4:
+                return "Two Pair";
+            case 3:
+                return "One Pair";
+            default:
+                return "High Card";
+        }
+    }
+
     public static long cardRank(LinkedList<Card> cards) {
         /*
          * 다섯 장을 판별하는 방법:
@@ -66,35 +101,25 @@ public class Rank {
             flush = true;
         }
 
-        /* 
-         * rank: 숫자가 클수록 높은 순위
-         * 총 8자리:
-         * 1~2: 족보
-         * 3~4: 페어(1)
-         * 5~6: 페어(2)
-         * 7~8: 하이 카드(1)
-         * 9~10: 하이 카드(2)
-         */ 
-        
-        long rank = 2_00_00_00_00;
+        long rank = 2 * CATEGORY_BASE;
         if (straight && flush) {
-            rank = 10_00_00_00_00;
+            rank = 10 * CATEGORY_BASE;
         } else if (pairCount == 6) { // 포카드
-            rank = 9_00_00_00_00;
+            rank = 9 * CATEGORY_BASE;
         } else if (pairCount == 4) { // 풀하우스
-            rank = 8_00_00_00_00;
+            rank = 8 * CATEGORY_BASE;
         } else if (flush) {
-            rank = 7_00_00_00_00;
+            rank = 7 * CATEGORY_BASE;
         } else if (straight) {
-            rank = 6_00_00_00_00;
+            rank = 6 * CATEGORY_BASE;
         } else if (pairCount == 3) {
-            rank = 5_00_00_00_00;
+            rank = 5 * CATEGORY_BASE;
         } else if (pairCount == 2) {
-            rank = 4_00_00_00_00;
+            rank = 4 * CATEGORY_BASE;
         } else if (pairCount == 1) {
-            rank = 3_00_00_00_00;
+            rank = 3 * CATEGORY_BASE;
         } else {                     // 하이 카드(족보)
-            rank = 2_00_00_00_00;
+            rank = 2 * CATEGORY_BASE;
         }
 
         // highCard 정보를 덧셈 형식으로 추가, 형식 예시: rank = 700 + highCard;
@@ -113,14 +138,29 @@ public class Rank {
         }
         Collections.sort(sortedNum);
 
-        int tempRank = (int)(rank / 1_00_00_00_00); // 족보만 추출
+        int tempRank = (int)(rank / CATEGORY_BASE); // 족보만 추출
         switch (tempRank) {
-            // 5장 내에서 판단해야 하는 경우 중 스트레이트 플러시, 플러시, 스트레이트, 하이 카드
+            // 스트레이트 플러시, 스트레이트
             case 10:
-            case 7:
             case 6:
-            case 2:
+                // [A, 2, 3, 4, 5]의 경우 하이 카드: 5
+                if (sortedNum.get(0) == 2 && 
+                    sortedNum.get(1) == 3 && 
+                    sortedNum.get(2) == 4 && 
+                    sortedNum.get(3) == 5 && 
+                    sortedNum.get(4) == 14) {
+                    return 5;
+                }
+                // 이외의 경우 하이 카드: getLast()
                 return sortedNum.getLast();
+            // 플러시, 하이 카드: 5장 모두 비교 필요
+            case 7:
+            case 2:
+                return (sortedNum.get(4) * 1_00_00_00_00L + 
+                        sortedNum.get(3) * 1_00_00_00L + 
+                        sortedNum.get(2) * 1_00_00L + 
+                        sortedNum.get(1) * 1_00L + 
+                        sortedNum.get(0));
             // 풀하우스
             case 8:
                 /* 
@@ -133,31 +173,37 @@ public class Rank {
                 * arr1[0] == arr1[2], arr2[0] != arr2[2]
                 */
                 if (sortedNum.get(0) == sortedNum.get(2)) {
-                    return sortedNum.get(2) * 1_00_00_00 + sortedNum.get(4) * 10000;
+                    return (sortedNum.get(2) * 1_00_00_00_00L + sortedNum.get(4) * 1_00_00_00L);
                 } else {
-                    return sortedNum.get(2) * 1_00_00_00 + sortedNum.get(0) * 10000;
+                    return (sortedNum.get(2) * 1_00_00_00_00L + sortedNum.get(0) * 1_00_00_00L);
                 }
             // 포카드, 트리플, 페어 등 5장 내에서 판단하지 않을 경우
             // 포카드: 5 5 5 5 6 / 5 6 6 6 6
             case 9:
                 // 5 5 5 5 6일 경우
                 if (sortedNum.get(0) == sortedNum.get(3)) {
-                    return (sortedNum.get(0) * 1_00_00_00 + sortedNum.get(4)); // 포카드 + 키커
+                    return (sortedNum.get(0) * 1_00_00_00_00L + sortedNum.get(4) * 1_00_00_00L); // 포카드 + 키커
                 // 5 6 6 6 6일 경우
                 } else { 
-                    return sortedNum.get(4) * 1_00_00_00 + sortedNum.get(0); // 포카드 + 키커
+                    return (sortedNum.get(4) * 1_00_00_00_00L + sortedNum.get(0) * 1_00_00_00L); // 포카드 + 키커
                 }
             // 트리플: 3 3 3 4 5 / 3 4 4 4 5 / 3 4 5 5 5
             case 5:
                 // 3 3 3 4 5일 경우
                 if (sortedNum.get(0) == sortedNum.get(2)) {
                     // 트리플 값 + 키커1 + 키커2
-                    return (sortedNum.get(0) * 1_00_00_00 + sortedNum.get(4) * 10000 + sortedNum.get(3));
+                    return (sortedNum.get(0) * 1_00_00_00_00L + 
+                            sortedNum.get(4) * 1_00_00_00L + 
+                            sortedNum.get(3) * 1_00_00L);
                 } else if (sortedNum.get(1) == sortedNum.get(3)) {
                 // 3 4 4 4 5일 경우 
-                    return (sortedNum.get(1) * 1_00_00_00 + sortedNum.get(4) * 10000 + sortedNum.get(0));
+                    return (sortedNum.get(1) * 1_00_00_00_00L + 
+                            sortedNum.get(4) * 1_00_00_00L + 
+                            sortedNum.get(0) * 1_00_00L);
                 } else { // 3 4 5 5 5일 경우
-                    return (sortedNum.get(2) * 1_00_00_00 + sortedNum.get(1) * 10000 + sortedNum.get(0));
+                    return (sortedNum.get(2) * 1_00_00_00_00L + 
+                            sortedNum.get(1) * 1_00_00_00L +
+                            sortedNum.get(0) * 1_00_00L);
                 }
             // 원 페어: 2 2 3 4 5 / 2 3 3 4 5 / 2 3 4 4 5 / 2 3 4 5 5
             case 3:
@@ -178,7 +224,10 @@ public class Rank {
                 }
                 Collections.sort(kickers);
                 // 페어 + 3개 킥커        
-                return (pairIndex * 1_00_00_00 + kickers.get(2) * 10000 + kickers.get(1) * 100 + kickers.get(0)); 
+                return (pairIndex * 1_00_00_00_00L + 
+                        kickers.get(2) * 1_00_00_00L + 
+                        kickers.get(1) * 1_00_00L + 
+                        kickers.get(0) * 1_00L); 
             // 투 페어: 2 2 3 3 4 / 2 2 3 4 4 / 2 3 3 4 4
             case 4:              
                 int firstPair, secondPair, kicker;
@@ -193,18 +242,20 @@ public class Rank {
                     firstPair = sortedNum.get(3);
                     secondPair = sortedNum.get(0);
                     kicker = sortedNum.get(2);
-                } else { // 2 3 3 4 4일 경우
+                } else { // 2 3 3 4 4일 경웅
                     firstPair = sortedNum.get(4);
                     secondPair = sortedNum.get(2);
                     kicker = sortedNum.get(0);
                 }
-                return (firstPair * 1_00_00_00 + secondPair * 10000 + kicker); // 페어1 > 페어2 > 키커
+                return (firstPair * 1_00_00_00_00L + 
+                        secondPair * 1_00_00_00L + 
+                        kicker * 1_00_00L); // 페어1 > 페어2 > 키커
             }
             return rank;
         }
     
     public static long bestRank(LinkedList<Card> cards) {
-        long bestRank = 2_00_00_00_00; // 가장 낮은 랭크로 초기화
+        long bestRank = 2 * CATEGORY_BASE; // 가장 낮은 랭크로 초기화
         /*
          * 7장의 카드 중 5장을 선택하는 모든 조합을 확인
          * i = 0, j = 1 ~ 6까지 검사
