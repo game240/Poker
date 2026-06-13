@@ -129,7 +129,9 @@ public class Rank {
     }
 
     // 각 족보의 하이 카드 return: 같은 rank일 때 족보를 따져보는 용도
-    public static long highCard(LinkedList<Integer> sortedNum, long rank) {
+    public static long highCard(LinkedList<Integer> orgSortedNum, long rank) {
+        LinkedList<Integer> sortedNum = new LinkedList<>(orgSortedNum);
+        
         // 계산의 편리를 위해 sortedNum의 1(A) -> 14로 변환
         for (int i = 0; i < sortedNum.size(); ++i) {
             if (sortedNum.get(i) == 1) {
@@ -251,7 +253,7 @@ public class Rank {
                         secondPair * 1_00_00_00L + 
                         kicker * 1_00_00L); // 페어1 > 페어2 > 키커
             }
-            return rank;
+            return 0;
         }
     
     public static long bestRank(LinkedList<Card> cards) {
