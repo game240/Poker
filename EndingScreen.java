@@ -1,50 +1,13 @@
-package MainRepository;
-
 import java.util.List;
 
 class EndingScreen extends Screen{
-    // 랭크 입력하면 문자열 반환해주는 함수
-    static String rankOfCards(int rank) {
-        String rankString;
-        switch (rank / 1_00_00_00_00) {
-            case 10:
-                rankString = "Straight Flush";
-                break;
-            case 9:
-                rankString = "Four of a Kind";
-                break;
-            case 8:
-                rankString = "Full House";
-                break;
-            case 7:
-                rankString = "Flush";
-                break;
-            case 6:
-                rankString = "Straight";
-                break;
-            case 5:
-                rankString = "Three of a Kind";
-                break;
-            case 4:
-                rankString = "Two Pair";
-                break;
-            case 3:
-                rankString = "One Pair";
-                break;
-            default:
-                rankString = "High Card";
-                break;
-        }
-        return rankString;
-    }
-
     // 플레이어 별 rank를 담은 배열 만드는 함수(n은 플레이어 수)
     static String[] makeRankArr(Player[] players,int n){
         String[] playersRank = new String[n];
         
         for (int i = 0; i < playersRank.length; ++i) {
-            int rank = Rank.bestRank(players[i].hands);
-            playersRank[i] = rankOfCards(rank);
+        long rank = Rank.bestRank(players[i].hands);
+            playersRank[i] = Rank.rankToString(rank);
         }
         return playersRank;
     }

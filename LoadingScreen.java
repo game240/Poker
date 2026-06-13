@@ -1,5 +1,3 @@
-package MainRepository;
-
 public class LoadingScreen extends Screen {
    
     // System.out.printf("▓▓▓▓▓▓▓▓▓▓▓▓▓\n");

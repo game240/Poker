@@ -1,5 +1,3 @@
-package MainRepository;
-
 import java.util.Scanner;
 
 public class MainGameScreen extends Screen {
